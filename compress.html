@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+        <script type="text/javascript">
+            function  audioPlayer(){
+
+                //Grab the stuff we need.
+                var myAudio = document.querySelector('audio');
+                var pre = document.querySelector('pre');
+                var myScript = document.querySelector('script');
+                var button = document.querySelector('button');
+            
+                pre.innerHTML = myScript.innerHTML;
+
+                var audioCtx;
+                myAudio.addEventListener('play', () => {
+                if(!audioCtx) {
+
+                    var AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                
+                    var compressor = audioCtx.createDynamicsCompressor();
+                    compressor.threshold.value = -50;
+                    compressor.knee.value = 40;
+                    compressor.ratio.value = 12;
+                    compressor.attack.value = 0;
+                    compressor.release.value = 0.25;
+                    source.connect(audioCtx.destination);
+                    button.onclick = function() {
+                    var active = button.getAttribute('data-active');
+                    if(active == 'false') {
+                        button.setAttribute('data-active', 'true');
+                        button.innerHTML = 'Remove compression';
+                        source.disconnect(audioCtx.destination);
+                        source.connect(compressor);
+                        compressor.connect(audioCtx.destination);
+                    } else if(active == 'true') {
+                        button.setAttribute('data-active', 'false');
+                        button.innerHTML = 'Add compression';
+                        source.disconnect(compressor);
+                        compressor.disconnect(audioCtx.destination);
+                        source.connect(audioCtx.destination);
+                    }
+                    }
+                }
+            })
+            window.onload = audioPlayer;
+
+        }
+          </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>POC Compressor</title>
+  </head>
+
+  <body>
+    <h1>Compressor POC</h1>
+    <audio controls>
+      <source src="audio files/song.mp3" type="audio/mp3">
+    </audio>
+    <button data-active="false">Add compression</button>
+    <pre></pre>
+  </body>
+
+
+</html>
